@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libicu-dev \
-    libonig-dev
+    libonig-dev \
+    nodejs \
+    npm
 
 RUN docker-php-ext-install \
     intl \
@@ -21,11 +23,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-# buat env file
 RUN cp .env.example .env
 
+# install backend
 RUN composer install --no-dev --optimize-autoloader
 
-EXPOSE 8000
+# build frontend
+RUN npm install
+RUN npm run build
 
 CMD php -S 0.0.0.0:$PORT -t public
