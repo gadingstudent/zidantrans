@@ -1,0 +1,7 @@
+[phases.setup]
+aptPkgs = ["libicu-dev", "libzip-dev", "zip", "unzip"]
+
+[phases.install]
+cmds = [
+  "composer install --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip"
+]
