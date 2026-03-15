@@ -16,11 +16,13 @@ RUN docker-php-ext-install \
     pdo_mysql \
     mbstring
 
-# install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY . .
+
+# buat env file
+RUN cp .env.example .env
 
 RUN composer install --no-dev --optimize-autoloader
 
