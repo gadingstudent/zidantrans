@@ -84,6 +84,18 @@ class MidtransCallbackController extends Controller
         ][$txStatus] ?? $booking->status;
 
         DB::transaction(function () use ($booking, $payment, $paymentTag, $txStatus, $n) {
+            // Status booking saat ini
+            $currentStatus = $booking->status;
+
+            // Status yang tidak boleh ditimpa
+            $finalStatuses = ['paid', 'cancelled'];
+
+            // Jika status saat ini final, jangan update lagi
+            if (in_array($currentStatus, $finalStatuses)) {
+                Log::info("⚠️ Status not updated. Current: {$currentStatus}, New: {$paymentTag}");
+                return;
+            }
+
             $booking->update(['status' => $paymentTag]);
 
             $payment->update([
@@ -92,6 +104,7 @@ class MidtransCallbackController extends Controller
                 'payment_method' => $n['payment_type'] ?? null,
             ]);
         });
+
 
         Log::info('✅ Callback processed', [
             'booking_id' => $booking->booking_id,
